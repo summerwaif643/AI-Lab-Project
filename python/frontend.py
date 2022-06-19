@@ -1,6 +1,7 @@
 import streamlit as st 
 import pandas as pd 
 
+# Import single class from main.py 
 # Run the content of this file with: python -m streamlit run your_script.py
 
 # File upload *Max 200mb File allowed
