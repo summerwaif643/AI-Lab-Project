@@ -9,14 +9,14 @@ import torch.nn as nn
 import torch.nn.functional as functional 
 
 import torchvision.models as models
-from torchvision import datasets, transform
+from torchvision import datasets, transforms
 
 import os, shutil, time
-
 import average_meter as AverageMeter
 
 #Classes imports
 from python.subproject.colorization import ColorizationNet
+from python.subproject.grayscale import GrayscaleImageFolder
 
 # Use GPU if available
 use_gpu = torch.cuda.is_available()
@@ -46,7 +46,7 @@ def validate(val_loader, model, criterion, save_images, epoch):
       for j in range(min(len(output_ab), 10)): # save at most 5 images
         save_path = {'grayscale': 'outputs/gray/', 'colorized': 'outputs/color/'}
         save_name = 'img-{}-epoch-{}.jpg'.format(i * val_loader.batch_size + j, epoch)
-        to_rgb(input_gray[j].cpu(), ab_input=output_ab[j].detach().cpu(), save_path=save_path, save_name=save_name)
+        GrayscaleImageFolder.to_rgb(input_gray[j].cpu(), ab_input=output_ab[j].detach().cpu(), save_path=save_path, save_name=save_name)
 
     # Record time to do forward passes and save images
     batch_time.update(time.time() - end)
@@ -111,6 +111,16 @@ optimizer = torch.optim.Adam(model.parameters(), lr=1e-2, weight_decay=0.0)
 if use_gpu: 
   criterion = criterion.cuda()
   model = model.cuda()
+
+# Training
+train_transforms = transforms.Compose([transforms.RandomResizedCrop(224), transforms.RandomHorizontalFlip()])
+train_imagefolder = GrayscaleImageFolder('images/train', train_transforms)
+train_loader = torch.utils.data.DataLoader(train_imagefolder, batch_size=64, shuffle=True)
+
+# Validation 
+val_transforms = transforms.Compose([transforms.Resize(256), transforms.CenterCrop(224)])
+val_imagefolder = GrayscaleImageFolder('images/val' , val_transforms)
+val_loader = torch.utils.data.DataLoader(val_imagefolder, batch_size=64, shuffle=False)
 
 # Make folders and set parameters
 os.makedirs('outputs/color', exist_ok=True)
