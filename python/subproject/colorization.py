@@ -4,7 +4,7 @@ import torch.nn.functional as functional
 import torchvision.models as models
 from torchvision import datasets, transforms
 
-class ColorizationNet(nn.module):
+class ColorizationNet(nn.Module):
 
     def forward(self, input):
         # Pass input through ResNet-gray to extract features

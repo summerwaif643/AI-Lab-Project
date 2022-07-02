@@ -1,7 +1,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt 
 
-from skimage.color import lab2rgb, rgb2lab, rbg2gray
+from skimage.color import lab2rgb, rgb2lab, rgb2gray
 from skimage import io 
 
 import torch 
@@ -12,14 +12,29 @@ import torchvision.models as models
 from torchvision import datasets, transforms
 
 import os, shutil, time
-import average_meter as AverageMeter
 
 #Classes imports
-from python.subproject.colorization import ColorizationNet
-from python.subproject.grayscale import GrayscaleImageFolder
+from colorization import ColorizationNet
+from grayscale import GrayscaleImageFolder
+from average_meter import AverageMeter
 
 # Use GPU if available
 use_gpu = torch.cuda.is_available()
+def to_rgb(self, grayscale_input, ab_input, save_path=None, save_name=None):
+    '''Show/save rgb image from grayscale and ab channels
+    Input save_path in the form {'grayscale': '/path/', 'colorized': '/path/'}
+    '''
+    plt.clf() # clear matplotlib 
+    color_image = torch.cat((grayscale_input, ab_input), 0).numpy() # combine channels
+    color_image = color_image.transpose((1, 2, 0))  # rescale for matplotlib
+    color_image[:, :, 0:1] = color_image[:, :, 0:1] * 100
+    color_image[:, :, 1:3] = color_image[:, :, 1:3] * 255 - 128   
+    color_image = lab2rgb(color_image.astype(np.float64))
+    grayscale_input = grayscale_input.squeeze().numpy()
+
+    if save_path is not None and save_name is not None: 
+        plt.imsave(arr=grayscale_input, fname='{}{}'.format(save_path['grayscale'], save_name), cmap='gray')
+        plt.imsave(arr=color_image, fname='{}{}'.format(save_path['colorized'], save_name))
 
 def validate(val_loader, model, criterion, save_images, epoch):
   model.eval()
@@ -46,7 +61,7 @@ def validate(val_loader, model, criterion, save_images, epoch):
       for j in range(min(len(output_ab), 10)): # save at most 5 images
         save_path = {'grayscale': 'outputs/gray/', 'colorized': 'outputs/color/'}
         save_name = 'img-{}-epoch-{}.jpg'.format(i * val_loader.batch_size + j, epoch)
-        GrayscaleImageFolder.to_rgb(input_gray[j].cpu(), ab_input=output_ab[j].detach().cpu(), save_path=save_path, save_name=save_name)
+        to_rgb(input_gray[j].cpu(), ab_input=output_ab[j].detach().cpu(), save_path=save_path, save_name=save_name)
 
     # Record time to do forward passes and save images
     batch_time.update(time.time() - end)
@@ -114,12 +129,12 @@ if use_gpu:
 
 # Training
 train_transforms = transforms.Compose([transforms.RandomResizedCrop(224), transforms.RandomHorizontalFlip()])
-train_imagefolder = GrayscaleImageFolder('images/train', train_transforms)
+train_imagefolder = GrayscaleImageFolder('images/train_files', train_transforms)
 train_loader = torch.utils.data.DataLoader(train_imagefolder, batch_size=64, shuffle=True)
 
 # Validation 
 val_transforms = transforms.Compose([transforms.Resize(256), transforms.CenterCrop(224)])
-val_imagefolder = GrayscaleImageFolder('images/val' , val_transforms)
+val_imagefolder = GrayscaleImageFolder('images/validation_files' , val_transforms)
 val_loader = torch.utils.data.DataLoader(val_imagefolder, batch_size=64, shuffle=False)
 
 # Make folders and set parameters
