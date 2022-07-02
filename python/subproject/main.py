@@ -20,7 +20,7 @@ from average_meter import AverageMeter
 
 # Use GPU if available
 use_gpu = torch.cuda.is_available()
-def to_rgb(self, grayscale_input, ab_input, save_path=None, save_name=None):
+def to_rgb(grayscale_input, ab_input, save_path=None, save_name=None):
     '''Show/save rgb image from grayscale and ab channels
     Input save_path in the form {'grayscale': '/path/', 'colorized': '/path/'}
     '''
@@ -61,6 +61,7 @@ def validate(val_loader, model, criterion, save_images, epoch):
       for j in range(min(len(output_ab), 10)): # save at most 5 images
         save_path = {'grayscale': 'outputs/gray/', 'colorized': 'outputs/color/'}
         save_name = 'img-{}-epoch-{}.jpg'.format(i * val_loader.batch_size + j, epoch)
+        print(input_gray[j].cpu())
         to_rgb(input_gray[j].cpu(), ab_input=output_ab[j].detach().cpu(), save_path=save_path, save_name=save_name)
 
     # Record time to do forward passes and save images
