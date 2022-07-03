@@ -1,17 +1,15 @@
 import numpy as np 
 import matplotlib.pyplot as plt 
 
-from skimage.color import lab2rgb, rgb2lab, rgb2gray
+from skimage.color import lab2rgb
 from skimage import io 
 
 import torch 
 import torch.nn as nn 
-import torch.nn.functional as functional 
 
-import torchvision.models as models
 from torchvision import datasets, transforms
 
-import os, shutil, time
+import os, time
 
 #Classes imports
 from colorization import ColorizationNet
@@ -21,15 +19,19 @@ from average_meter import AverageMeter
 # Use GPU if available
 use_gpu = torch.cuda.is_available()
 def to_rgb(grayscale_input, ab_input, save_path=None, save_name=None):
-    '''Show/save rgb image from grayscale and ab channels
+    '''
+    Show/save rgb image from grayscale and ab channels
     Input save_path in the form {'grayscale': '/path/', 'colorized': '/path/'}
     '''
     plt.clf() # clear matplotlib 
     color_image = torch.cat((grayscale_input, ab_input), 0).numpy() # combine channels
     color_image = color_image.transpose((1, 2, 0))  # rescale for matplotlib
+    # L Rescaling
     color_image[:, :, 0:1] = color_image[:, :, 0:1] * 100
+    # AB Rescaling
     color_image[:, :, 1:3] = color_image[:, :, 1:3] * 255 - 128   
     color_image = lab2rgb(color_image.astype(np.float64))
+
     grayscale_input = grayscale_input.squeeze().numpy()
 
     if save_path is not None and save_name is not None: 
@@ -48,7 +50,8 @@ def validate(val_loader, model, criterion, save_images, epoch):
     data_time.update(time.time() - end)
 
     # Use GPU
-    if use_gpu: input_gray, input_ab, target = input_gray.cuda(), input_ab.cuda(), target.cuda()
+    if use_gpu: 
+        input_gray, input_ab, target = input_gray.cuda(), input_ab.cuda(), target.cuda()
 
     # Run model and record loss
     output_ab = model(input_gray) # throw away class predictions
@@ -134,7 +137,7 @@ train_loader = torch.utils.data.DataLoader(train_imagefolder, batch_size=64, shu
 
 # Validation 
 val_transforms = transforms.Compose([transforms.Resize(256), transforms.CenterCrop(224)])
-val_imagefolder = GrayscaleImageFolder('images/try' , val_transforms)
+val_imagefolder = GrayscaleImageFolder('images/validation_files' , val_transforms)
 val_loader = torch.utils.data.DataLoader(val_imagefolder, batch_size=64, shuffle=False)
 
 # Make folders and set parameters
@@ -142,6 +145,7 @@ os.makedirs('outputs/color', exist_ok=True)
 os.makedirs('outputs/gray', exist_ok=True)
 os.makedirs('checkpoints', exist_ok=True)
 
+'''
 pretrained = torch.load('/home/ddave/AI-Lab-Project/python/subproject/checkpoints/model-epoch-23-losses-0.003.pth', map_location=lambda storage, loc: storage)
 model.load_state_dict(pretrained)
 save_images = True
@@ -164,4 +168,3 @@ for epoch in range(epochs):
   if losses < best_losses:
     best_losses = losses
     torch.save(model.state_dict(), 'checkpoints/model-epoch-{}-losses-{:.3f}.pth'.format(epoch+1,losses))
-'''

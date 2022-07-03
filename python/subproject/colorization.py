@@ -31,17 +31,21 @@ class ColorizationNet(nn.Module):
             nn.Conv2d(MIDLEVEL_FEATURE_SIZE, 128, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(128),
             nn.Mish(),
+
             nn.Upsample(scale_factor=2),
             nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(64),
             nn.Mish(),
+
             nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(64),
             nn.Mish(),
+
             nn.Upsample(scale_factor=2),
             nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(32),
             nn.Mish(),
+            
             nn.Conv2d(32, 2, kernel_size=3, stride=1, padding=1),
             nn.Upsample(scale_factor=2)
         )
