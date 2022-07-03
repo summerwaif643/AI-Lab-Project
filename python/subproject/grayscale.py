@@ -15,9 +15,11 @@ class GrayscaleImageFolder(datasets.ImageFolder):
         if self.transform is not None:
             img_original = self.transform(img)
             img_original = np.asarray(img_original)
+
             img_lab = rgb2lab(img_original)
             img_lab = (img_lab + 128) / 255
             img_ab = img_lab[:, :, 1:3]
+            
             img_ab = torch.from_numpy(img_ab.transpose((2, 0, 1))).float()
             img_original = rgb2gray(img_original)
             img_original = torch.from_numpy(img_original).unsqueeze(0).float()

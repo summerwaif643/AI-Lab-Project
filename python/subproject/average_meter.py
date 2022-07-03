@@ -1,4 +1,5 @@
 class AverageMeter(object):
+    
   '''A handy class from the PyTorch ImageNet tutorial''' 
   def __init__(self):
     self.reset()

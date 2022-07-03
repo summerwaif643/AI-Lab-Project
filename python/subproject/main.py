@@ -61,7 +61,6 @@ def validate(val_loader, model, criterion, save_images, epoch):
       for j in range(min(len(output_ab), 10)): # save at most 5 images
         save_path = {'grayscale': 'outputs/gray/', 'colorized': 'outputs/color/'}
         save_name = 'img-{}-epoch-{}.jpg'.format(i * val_loader.batch_size + j, epoch)
-        print(input_gray[j].cpu())
         to_rgb(input_gray[j].cpu(), ab_input=output_ab[j].detach().cpu(), save_path=save_path, save_name=save_name)
 
     # Record time to do forward passes and save images
@@ -89,7 +88,8 @@ def train(train_loader, model, criterion, optimizer, epoch):
   for i, (input_gray, input_ab, target) in enumerate(train_loader):
     
     # Use GPU if available
-    if use_gpu: input_gray, input_ab, target = input_gray.cuda(), input_ab.cuda(), target.cuda()
+    if use_gpu: 
+        input_gray, input_ab, target = input_gray.cuda(), input_ab.cuda(), target.cuda()
 
     # Record time to load data (above)
     data_time.update(time.time() - end)
@@ -119,7 +119,6 @@ def train(train_loader, model, criterion, optimizer, epoch):
 
   print('Finished training epoch {}'.format(epoch))
 
-
 model = ColorizationNet()
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-2, weight_decay=0.0)
@@ -135,7 +134,7 @@ train_loader = torch.utils.data.DataLoader(train_imagefolder, batch_size=64, shu
 
 # Validation 
 val_transforms = transforms.Compose([transforms.Resize(256), transforms.CenterCrop(224)])
-val_imagefolder = GrayscaleImageFolder('images/validation_files' , val_transforms)
+val_imagefolder = GrayscaleImageFolder('images/try' , val_transforms)
 val_loader = torch.utils.data.DataLoader(val_imagefolder, batch_size=64, shuffle=False)
 
 # Make folders and set parameters
@@ -143,17 +142,26 @@ os.makedirs('outputs/color', exist_ok=True)
 os.makedirs('outputs/gray', exist_ok=True)
 os.makedirs('checkpoints', exist_ok=True)
 
+pretrained = torch.load('/home/ddave/AI-Lab-Project/python/subproject/checkpoints/model-epoch-23-losses-0.003.pth', map_location=lambda storage, loc: storage)
+model.load_state_dict(pretrained)
+save_images = True
+with torch.no_grad():
+  validate(val_loader, model, criterion, save_images, 0)
+'''
+
 #TODO: Make trains
 save_images = True
 best_losses = 1e10
-epochs = 100
+epochs = 10
 
 for epoch in range(epochs):
   # Train for one epoch, then validate
   train(train_loader, model, criterion, optimizer, epoch)
   with torch.no_grad():
     losses = validate(val_loader, model, criterion, save_images, epoch)
+
   # Save checkpoint and replace old best model if current model is better
   if losses < best_losses:
     best_losses = losses
     torch.save(model.state_dict(), 'checkpoints/model-epoch-{}-losses-{:.3f}.pth'.format(epoch+1,losses))
+'''
