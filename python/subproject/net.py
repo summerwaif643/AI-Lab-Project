@@ -18,6 +18,7 @@ from average_meter import AverageMeter
 
 # Use GPU if available
 use_gpu = torch.cuda.is_available()
+
 def to_rgb(grayscale_input, ab_input, save_path=None, save_name=None):
     '''
     Show/save rgb image from grayscale and ab channels
@@ -62,8 +63,11 @@ def validate(val_loader, model, criterion, save_images, epoch):
     if save_images and not already_saved_images:
       already_saved_images = True
       for j in range(min(len(output_ab), 10)): # save at most 5 images
-        save_path = {'grayscale': 'outputs/gray/', 'colorized': 'outputs/color/'}
+        save_path = {'grayscale': 'outputs/gray/', 
+                        'colorized': 'outputs/color/'}
+
         save_name = 'img-{}-epoch-{}.jpg'.format(i * val_loader.batch_size + j, epoch)
+        
         to_rgb(input_gray[j].cpu(), ab_input=output_ab[j].detach().cpu(), save_path=save_path, save_name=save_name)
 
     # Record time to do forward passes and save images
@@ -122,49 +126,51 @@ def train(train_loader, model, criterion, optimizer, epoch):
 
   print('Finished training epoch {}'.format(epoch))
 
-model = ColorizationNet()
-criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-2, weight_decay=0.0)
+if __name__ == "__main__":
 
-if use_gpu: 
-  criterion = criterion.cuda()
-  model = model.cuda()
+    model = ColorizationNet()
+    criterion = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-2, weight_decay=0.0)
 
-# Training
-train_transforms = transforms.Compose([transforms.RandomResizedCrop(224), transforms.RandomHorizontalFlip()])
-train_imagefolder = GrayscaleImageFolder('images/train_files', train_transforms)
-train_loader = torch.utils.data.DataLoader(train_imagefolder, batch_size=64, shuffle=True)
+    if use_gpu: 
+        criterion = criterion.cuda()
+        model = model.cuda()
 
-# Validation 
-val_transforms = transforms.Compose([transforms.Resize(256), transforms.CenterCrop(224)])
-val_imagefolder = GrayscaleImageFolder('images/validation_files' , val_transforms)
-val_loader = torch.utils.data.DataLoader(val_imagefolder, batch_size=64, shuffle=False)
+    # Training
+    train_transforms = transforms.Compose([transforms.RandomResizedCrop(224), transforms.RandomHorizontalFlip()])
+    train_imagefolder = GrayscaleImageFolder('images/train_files', train_transforms)
+    train_loader = torch.utils.data.DataLoader(train_imagefolder, batch_size=64, shuffle=True)
 
-# Make folders and set parameters
-os.makedirs('outputs/color', exist_ok=True)
-os.makedirs('outputs/gray', exist_ok=True)
-os.makedirs('checkpoints', exist_ok=True)
+    # Validation 
+    val_transforms = transforms.Compose([transforms.Resize(256), transforms.CenterCrop(224)])
+    val_imagefolder = GrayscaleImageFolder('images/validation_files' , val_transforms)
+    val_loader = torch.utils.data.DataLoader(val_imagefolder, batch_size=64, shuffle=False)
 
-'''
-pretrained = torch.load('/home/ddave/AI-Lab-Project/python/subproject/checkpoints/model-epoch-23-losses-0.003.pth', map_location=lambda storage, loc: storage)
-model.load_state_dict(pretrained)
-save_images = True
-with torch.no_grad():
-  validate(val_loader, model, criterion, save_images, 0)
-'''
+    # Make folders and set parameters
+    os.makedirs('outputs/color', exist_ok=True)
+    os.makedirs('outputs/gray', exist_ok=True)
+    os.makedirs('checkpoints', exist_ok=True)
 
-#TODO: Make trains
-save_images = True
-best_losses = 1e10
-epochs = 10
+    '''
+    pretrained = torch.load('/home/ddave/AI-Lab-Project/python/subproject/checkpoints/model-epoch-23-losses-0.003.pth', map_location=lambda storage, loc: storage)
+    model.load_state_dict(pretrained)
+    save_images = True
+    with torch.no_grad():
+    validate(val_loader, model, criterion, save_images, 0)
+    '''
 
-for epoch in range(epochs):
-  # Train for one epoch, then validate
-  train(train_loader, model, criterion, optimizer, epoch)
-  with torch.no_grad():
-    losses = validate(val_loader, model, criterion, save_images, epoch)
+    #TODO: Make trains
+    save_images = True
+    best_losses = 1e10
+    epochs = 10
 
-  # Save checkpoint and replace old best model if current model is better
-  if losses < best_losses:
-    best_losses = losses
-    torch.save(model.state_dict(), 'checkpoints/model-epoch-{}-losses-{:.3f}.pth'.format(epoch+1,losses))
+    for epoch in range(epochs):
+        # Train for one epoch, then validate
+        train(train_loader, model, criterion, optimizer, epoch)
+        with torch.no_grad():
+            losses = validate(val_loader, model, criterion, save_images, epoch)
+
+        # Save checkpoint and replace old best model if current model is better
+        if losses < best_losses:
+            best_losses = losses
+            torch.save(model.state_dict(), 'checkpoints/model-epoch-{}-losses-{:.3f}.pth'.format(epoch+1,losses))
