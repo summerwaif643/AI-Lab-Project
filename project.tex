@@ -49,23 +49,23 @@ from a converted grayscale image. Each image is transposed to a LAB format befor
 the features from the grayscale image (using the L channel).
 
 \subsection{LAB format and image processing}
-Before processing any image, we aim to bring them to a given resolution ($256 \cross 256$) and then 
+Before processing any image, we aim to bring them to a given resolution ($256 \times 256$) and then 
 convert them from the RGB format to the LAB one. This is done because the RGB format makes it more 
 difficult to differentiate colors from the grayscale, whereas in the LAB format we have 
 immediately, without computation, the Lightness channel and the color channels (AB) divided from the 
 start. 
+\pagebreak
 
 \begin{figure}[htp]
 
     %TODO: insert here all subsequents 
     \centering
-    \includegraphics[width=.3\textwidth]{i/houghtrain.png}\hfill
-    \includegraphics[width=.3\textwidth]{i/houghframe.png}\hfill
-    \includegraphics[width=.3\textwidth]{i/houghspace.png}
+    \includegraphics[width=.7\textwidth]{tex_images/lab.jpg}\hfill
+
     
-    \caption{default}
-    \label{fig:figure 1. The LAB color space. L for including lightness and 
+    \caption{The LAB color space. L for including lightness and 
     AB for every other space}
+    \label{fig:figure 1.}
     
     \end{figure}
 
@@ -77,7 +77,18 @@ We make use of the ResNet-18, which is an image classification network with 18
 layers, of which we will only use 6 modifying the first one to accept grayscale
 images. The other layers are simple Convolutional, Batchnorm and upsample 
 layers in the order presented inside the code. 
-% include image https://i.imgur.com/0DNuHMP.png
+
+\begin{figure}[htp]
+
+    %TODO: insert here all subsequents 
+    \centering
+    \includegraphics[width=.8\textwidth]{tex_images/net.png}\hfill
+
+    
+    \caption{ResNet Model including image processing steps}
+    \label{fig:figure 1.}
+    
+    \end{figure}
 
 
 \subsection{Loss function}
@@ -91,20 +102,139 @@ Since we're using ResNet18, our model is bound to use ReLu. We tried using
 newer techniques such as Mish, but after observing few results we can safely 
 say that Mish performs too drastically on this model. 
 % Insert image 1, 2 here
+\begin{figure}[htp]
+
+    %TODO: insert here all subsequents 
+    \centering
+    \includegraphics[width=.5\textwidth]{tex_images/mish.jpeg}\hfill
+    \includegraphics[width=.5\textwidth]{tex_images/ReLU.jpeg}\hfill
+    
+    \caption{On the left the model using mish, on the right ReLU}
+    \label{fig:figure 1.}
+    
+    \end{figure}
+
+This is because the Mish activates earlier than the ReLU, leaving us with more rash
+decisions. 
 
 \subsection{Optimizer}
-We use the Adam optimizer. 
+We use the Adam optimizer simply because it is one of the most officient optimizer 
+available to us.  
 
 \subsection{The dataset}
-As the dataset we used the 
+The dataset we used is made of 40,000 colored images in $256 \times 256$ format.
+Nearly every dataset made of images in whatever format works fine, as we then apply
+our transformations on it and 
+
+
+\subsection{Basic Code documentation}
+The scope of the project was to create an AI app through standard 
+software development techniques. Inside of the project you'll find
+different files that are here described. 
+
+\subsubsection{net.py}
+$\text{net.py}$ Holds the core to train the entire application. It is made of two 
+big functions, train and validate, which are then used when the model is created to 
+train it. Each time we finish training an epoch, we validate it and store our loss. 
+If the loss results lower than some other model, we create a "checkpoint" inside the 
+same folder, in order to start working with that model in our $\text{frontend.py}$ 
+Running this python file will start training with the settings found 
+in it. 
+
+\subsubsection{grayscale.py}
+$\text{grayscale.py}$ is a utility class which supers torchvision dataset imageloader. 
+This is done because each image before being loaded needs to be split into L and AB, 
+providing the ground truth and the black and white images we use to train our model. 
+
+
+\subsubsection{frontend.py}
+$\text{frontend.py}$ holds the core of the application. Using the $\text{streamlit}$
+python module, we create a simple web app which lets the end user upload a file and 
+have it colored through a saved model. This is all done in real time speed and it also 
+holds a simple cache which deletes the validated images once uploaded. It is runnable 
+with: \\ 
+\begin{verbatim}
+    streamlit run frontend.py
+\end{verbatim}
+This brings the whole application to life as it is deployable to the internet to show a 
+simple demo. 
+Important! This file contains absolute paths and creates problems when working with 
+relatives, as such, if you wish to run it, please consider updating all paths to 
+include your preferred method. 
+
+\subsubsection{colorization.py}
+Colorization.py holds the model used. It is a simple class which holds the 6 ResNet18
+layers. 
+
+\subsubsection{averagemeter.py}
+In averagemeter we have the $\text{AverageMeter}$ class. 
+This is a utility class often found in Ai projects for taking 
+averages. In the program it is used to update the batch time 
+and the loss time when training and validating the model.
+
+\subsubsection{dataset.py}
+$\text{dataset.py}$ holds an utility class aimed towards helping organize an unorganized
+image dataset, which is often the case when working with datasets deriving from 
+kaggle. Running it will simply create two folders following a 70/30 splitting scheme.
+
+\begin{verbatim}
+\end{verbatim}
 
 \section{Results and ending}
+Given the nature of training the model on our own devices, our results were 
+capped at about 25 epochs. It takes us, on average, about 10 hours to get this far,
+but we plan nonetheless to bring a presentation to the exam training up to the maximum.
+\\
+What follows are some cherry picked results of some images we thought our model best 
+colored. 
 
+        \begin{figure}[htp]
 
-\section{Credits and links}
-\url{https://lukemelas.github.io/image-colorization.html} \\ 
-\url{https://colab.research.google.com/github/moein-shariatnia/Deep-Learning/blob/main/Image%20Colorization%20Tutorial/Image%20Colorization%20with%20U-Net%20and%20GAN%20Tutorial.ipynb#scrollTo=mGqbGWUQhzmk}
-\url{https://haoyiq.com/project/eecs442/} \\ 
+            %TODO: insert here all subsequents 
+            \centering
+            \includegraphics[width=.5\textwidth]{tex_images/1.jpeg}\hfill
+            \includegraphics[width=.5\textwidth]{tex_images/2.jpeg}\hfill
+            
+            \caption{On the left the ground truth, on the right the derived image}
+            \label{fig:figure 1.}
+            
+            \end{figure}
 
+\pagebreak
 
+            \begin{figure}[htp]
+
+                %TODO: insert here all subsequents 
+                \includegraphics[width=.5\textwidth]{tex_images/6.jpeg}\hfill
+                \includegraphics[width=.5\textwidth]{tex_images/5.jpeg}\hfill
+                
+                \caption{On the left the ground truth, on the right the derived image}
+                \label{fig:figure 1.}
+                
+                \end{figure}
+
+                \begin{figure}[htp]
+
+                    %TODO: insert here all subsequents 
+                    \includegraphics[width=.5\textwidth]{tex_images/7.jpeg}\hfill
+                    \includegraphics[width=.5\textwidth]{tex_images/8.jpeg}\hfill
+                    
+                    \caption{On the left the ground truth, on the right the derived image}
+                    \label{fig:figure 1.}
+                    
+                    \end{figure}
+            As we can see, the model does a pretty good job considering it trained so 
+            little. It has some problems determining where to put blues, which 
+            could be seen as an overfit, but we produced some good results nonetheless.
+
+            During the final presentation we will present a more trained model on 
+            even more cases, such as photographs, sketches and black and white media.
+            
+            \pagebreak
+
+            \section{Credits and links}
+            \url{https://colab.research.google.com/github/moein-shariatnia/Deep-Learning/blob/main/Image%20Colorization%20Tutorial/Image%20Colorization%20with%20U-Net%20and%20GAN%20Tutorial.ipynb#scrollTo=mGqbGWUQhzmk}
+            \url{https://haoyiq.com/project/eecs442/} \\
+            \url{https://arxiv.org/pdf/1611.07004.pdf} \\
+            \url{https://arxiv.org/pdf/1603.08511.pdf} \\
 \end{document}
