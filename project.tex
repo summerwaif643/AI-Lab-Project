@@ -81,12 +81,22 @@ layers in the order presented inside the code.
 
 
 \subsection{Loss function}
+As the loss function, we work with the simple Mean Squared error. We try to 
+minimize the squared distance between the color value we try to predict and the 
+actual ground truth color value. 
+$$ MSE = \frac{1}{n} \sum^{n}_{i=1}(Y_i - \hat{Y_i})^2$$ 
 
 \subsection{Activation Function}
-\subsection{}
+Since we're using ResNet18, our model is bound to use ReLu. We tried using 
+newer techniques such as Mish, but after observing few results we can safely 
+say that Mish performs too drastically on this model. 
+% Insert image 1, 2 here
+
+\subsection{Optimizer}
+We use the Adam optimizer. 
 
 \subsection{The dataset}
-
+As the dataset we used the 
 
 \section{Results and ending}
 
@@ -94,7 +104,7 @@ layers in the order presented inside the code.
 \section{Credits and links}
 \url{https://lukemelas.github.io/image-colorization.html} \\ 
 \url{https://colab.research.google.com/github/moein-shariatnia/Deep-Learning/blob/main/Image%20Colorization%20Tutorial/Image%20Colorization%20with%20U-Net%20and%20GAN%20Tutorial.ipynb#scrollTo=mGqbGWUQhzmk}
-
+\url{https://haoyiq.com/project/eecs442/} \\ 
 
 
 \end{document}
