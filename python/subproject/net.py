@@ -67,7 +67,7 @@ def validate(val_loader, model, criterion, save_images, epoch):
                         'colorized': 'outputs/color/'}
 
         save_name = 'img-{}-epoch-{}.jpg'.format(i * val_loader.batch_size + j, epoch)
-        
+
         to_rgb(input_gray[j].cpu(), ab_input=output_ab[j].detach().cpu(), save_path=save_path, save_name=save_name)
 
     # Record time to do forward passes and save images
@@ -141,9 +141,9 @@ if __name__ == "__main__":
     train_imagefolder = GrayscaleImageFolder('images/train_files', train_transforms)
     train_loader = torch.utils.data.DataLoader(train_imagefolder, batch_size=64, shuffle=True)
 
-    # Validation 
+    # Validation  CHANGE VAL IMAGEFOLDER IF TRYING WITH PRETRAINED
     val_transforms = transforms.Compose([transforms.Resize(256), transforms.CenterCrop(224)])
-    val_imagefolder = GrayscaleImageFolder('images/validation_files' , val_transforms)
+    val_imagefolder = GrayscaleImageFolder('images/user_input' , val_transforms)
     val_loader = torch.utils.data.DataLoader(val_imagefolder, batch_size=64, shuffle=False)
 
     # Make folders and set parameters
@@ -151,18 +151,17 @@ if __name__ == "__main__":
     os.makedirs('outputs/gray', exist_ok=True)
     os.makedirs('checkpoints', exist_ok=True)
 
-    '''
-    pretrained = torch.load('/home/ddave/AI-Lab-Project/python/subproject/checkpoints/model-epoch-23-losses-0.003.pth', map_location=lambda storage, loc: storage)
+    
+    pretrained = torch.load('/home/ddave/AI-Lab-Project/python/subproject/checkpoints/model-epoch-20-losses-0.003.pth', map_location=lambda storage, loc: storage)
     model.load_state_dict(pretrained)
-    save_images = True
     with torch.no_grad():
-    validate(val_loader, model, criterion, save_images, 0)
-    '''
-
+        validate(val_loader, model, criterion, True, 0)
+    
+'''
     #TODO: Make trains
     save_images = True
     best_losses = 1e10
-    epochs = 10
+    epochs = 100
 
     for epoch in range(epochs):
         # Train for one epoch, then validate
@@ -174,3 +173,4 @@ if __name__ == "__main__":
         if losses < best_losses:
             best_losses = losses
             torch.save(model.state_dict(), 'checkpoints/model-epoch-{}-losses-{:.3f}.pth'.format(epoch+1,losses))
+'''
