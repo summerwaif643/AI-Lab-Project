@@ -6,12 +6,12 @@
 \contentsline {subsection}{\numberline {2.4}Activation Function}{5}{subsection.2.4}%
 \contentsline {subsection}{\numberline {2.5}Optimizer}{5}{subsection.2.5}%
 \contentsline {subsection}{\numberline {2.6}The dataset}{5}{subsection.2.6}%
-\contentsline {subsection}{\numberline {2.7}Basic Code documentation}{5}{subsection.2.7}%
+\contentsline {subsection}{\numberline {2.7}Basic Code documentation}{6}{subsection.2.7}%
 \contentsline {subsubsection}{\numberline {2.7.1}net.py}{6}{subsubsection.2.7.1}%
 \contentsline {subsubsection}{\numberline {2.7.2}grayscale.py}{6}{subsubsection.2.7.2}%
 \contentsline {subsubsection}{\numberline {2.7.3}frontend.py}{6}{subsubsection.2.7.3}%
 \contentsline {subsubsection}{\numberline {2.7.4}colorization.py}{6}{subsubsection.2.7.4}%
 \contentsline {subsubsection}{\numberline {2.7.5}averagemeter.py}{6}{subsubsection.2.7.5}%
-\contentsline {subsubsection}{\numberline {2.7.6}dataset.py}{6}{subsubsection.2.7.6}%
+\contentsline {subsubsection}{\numberline {2.7.6}dataset.py}{7}{subsubsection.2.7.6}%
 \contentsline {section}{\numberline {3}Results and ending}{7}{section.3}%
 \contentsline {section}{\numberline {4}Credits and links}{9}{section.4}%

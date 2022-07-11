@@ -17,7 +17,8 @@ from grayscale import GrayscaleImageFolder
 
 
 model = ColorizationNet()
-model.load_state_dict(torch.load("/home/ddave/AI-Lab-Project/python/subproject/checkpoints/model-epoch-9-losses-0.003.pth"))
+model.load_state_dict(torch.load("/home/dave/programs/AI-Lab-Project/python/subproject/checkpoints/model-epoch-99-losses-0.003.pth"
+, map_location=torch.device('cpu')))
 criterion = nn.MSELoss()
 
 def colorize(dir):
@@ -43,7 +44,7 @@ if image is not None:
     ## Input relative path here;; 
     
     #Save image
-    dir = "/home/ddave/AI-Lab-Project/python/subproject/images/streamlit_cache"
+    dir = "/home/dave/programs/AI-Lab-Project/python/subproject/images/streamlit_cache"
     filename = os.path.join(dir + '/class', image.name)
     with open(filename, "wb") as f:
         f.write((image).getbuffer())
@@ -56,10 +57,11 @@ if image is not None:
         st.write('Colorized image')
         colorize(dir)
         #Show colorized image ()
-        st.image('/home/ddave/AI-Lab-Project/python/subproject/outputs/color/img-0-epoch-0.jpg')
+        st.image('/home/dave/programs/AI-Lab-Project/python/subproject/outputs/color/img-0-epoch-0.jpg')
 
 #Once its done, delete all the contents in 
-class_dir = "/home/ddave/AI-Lab-Project/python/subproject/images/streamlit_cache/class"
+
+class_dir = "/home/dave/programs/AI-Lab-Project/python/subproject/images/streamlit_cache/class"
 for filename in os.listdir(class_dir):
     path = os.path.join(class_dir, filename)
     try:

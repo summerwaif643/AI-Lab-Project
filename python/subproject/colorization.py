@@ -21,7 +21,6 @@ class ColorizationNet(nn.Module):
 
         resnet = models.resnet18(num_classes=365)
 
-        ## What is the unsqueeze?
         # Change first convolutional layer to accept a single channel
         resnet.conv1.weight = nn.Parameter(resnet.conv1.weight.sum(dim=1).unsqueeze(1))
 
